@@ -6,6 +6,8 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
+import httpx
+
 from company_financials.config import DEFAULT_OUTPUT_DIR, LISTED_ORG_FORMS, MAX_FINANCIAL_YEARS
 from company_financials.http import create_client
 from company_financials.models import (
