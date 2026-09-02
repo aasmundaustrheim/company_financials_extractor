@@ -1,0 +1,12 @@
+.venv
+.git
+.pytest_cache
+.local-output
+.cursor
+__pycache__
+*.pyc
+*.egg-info
+dist
+tests
+.streamlit
+.env

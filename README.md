@@ -54,7 +54,7 @@ If several Brreg matches, `POST /extract` returns `needs_disambiguation: true` a
 
 ## Put the API on Railway (so Base44 can reach it)
 
-Railway waits long enough for a scrape (often 15–60 seconds). You need a GitHub push of this branch first.
+Railway waits long enough for a scrape (often 15–60 seconds). You need a GitHub push of this branch first. The repo includes a **Dockerfile** so Railway copies `README.md` and the source before installing (Nixpacks’ default `pip install .` step fails without those files).
 
 1. Open [railway.app](https://railway.app) and log in with GitHub
 2. **New project** → **Deploy from GitHub repo** → `company_financials_extractor`
