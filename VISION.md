@@ -1,10 +1,10 @@
 # Vision: structured company data for Value Beyond Wealth
 
-This file is the north star for this repo. V1 is intentionally small. Do not lose the later destination.
+This file is the north star for this repo. Do not lose the later destination.
 
 ## The problem
 
-Value Beyond Wealth (Base44 website) lets admins generate stock research with AI. The AI is weak at finding **correct company financials and related facts** if it has to hunt the web at query time. Those numbers should already exist in a structured store, then be handed to the researcher.
+Value Beyond Wealth (Base44 website) lets admins generate stock research with AI. The AI is weak at finding **correct company financials and other company data** if it has to hunt the web at query time. Those numbers should already exist in a structured store, then be handed to the researcher.
 
 ## Grand vision
 
@@ -26,33 +26,37 @@ Target contents (over time):
 
 Storage must stay **indexable by organisation number** (and later ticker), so lookup is cheap.
 
-### How Base44 should call this (later, not V1)
+### How Base44 calls this
 
-Base44 can import an OpenAPI spec as a custom workspace integration, or a Base44 backend function can `fetch` our HTTP API. The website should receive JSON that matches `CompanySnapshot` in this repo. Same extract function, different wrapper.
+Do **not** copy this Python extractor into Base44 (Base44 functions are TypeScript/Deno). Keep one codebase here.
 
-Production must **not** scrape Proff.no. Swap the Proff HTML adapter for a licensed Proff API (or equivalent) behind the same interface.
+1. This repo exposes `POST /extract` and `GET /companies/{orgnr}` (FastAPI wrapper around `extract_company()`).
+2. Host the API (Railway). JSON matches `CompanySnapshot`.
+3. Base44 imports `/openapi.json` as a custom workspace integration (`company-financials`), or a backend function `fetch`es the same URLs.
+4. Value Beyond Wealth saves the snapshot on a `CompanySnapshot` entity keyed by organisation number. The researcher reads that entity.
 
-## V1 (this repo, now)
+See [README.md](README.md) for local API, Railway, and Base44 click steps.
 
-Local-only quality check:
+Production-quality path still should **not** scrape Proff.no. Swap the Proff HTML adapter for a licensed Proff API (or equivalent) behind the same `extract_company()` interface. Personal-use can keep the scrape until then.
+
+## Now (this repo)
 
 - Norwegian companies only (listed and unlisted)
-- Streamlit on this PC, data in a local folder
+- Streamlit on this PC for quality checking; data in a local folder
+- HTTP API for Base44 (`src/company_financials/api.py`)
 - Brreg for identity, roles, group tree, last-year accounts (cross-check)
 - Public Proff.no pages for up to **five years** of financials (and shareholders when shown)
 - Computed margins/ratios that do not need a share price
-- No HTTP API, no Streamlit Cloud, no OAuth, no Base44 wiring
+- No Streamlit Cloud, no OAuth
 
-See [README.md](README.md) for how to run it.
+## Later
 
-## Later (after V1 quality looks good)
+1. Keep `extract_company()` and `CompanySnapshot` unchanged unless the JSON contract must grow.
+2. Replace the Proff scraper with a licensed feed.
+3. Add share prices, then multiples (P/E, EV/EBITDA, …).
+4. Other countries, one source adapter at a time.
 
-1. Keep `extract_company()` and `CompanySnapshot` unchanged.
-2. Add a thin FastAPI wrapper: cache-first `GET /companies/{orgnr}`, `POST /extract`.
-3. Publish OpenAPI for Base44.
-4. Replace the Proff scraper with a licensed feed.
-5. Add share prices, then multiples (P/E, EV/EBITDA, …).
-6. Other countries, one source adapter at a time.
+Improving the extractor later: change this repo, push to GitHub, Railway redeploys. Base44 keeps the same endpoints.
 
 ## Sibling project
 
